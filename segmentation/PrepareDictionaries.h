@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <list>
+#include "Block.h"
 #include "DoubleHashDictionary.h"
 #include "dictionary.h"
 #include "HashDictionary.h"
@@ -33,6 +35,8 @@ public:
 	HashDictionary *titleDic;
 	BinaryDictionary *numberDic;
 	FrequencyWord *freWords;
+	list<Block> outputList;
+	list<Block> results;
 
 	bool hitFamily;
 	int familyIndex;
@@ -51,5 +55,7 @@ public:
 	bool isNumber(char in);
 	bool isPunctuate(char in);
 	void collectNoFoundDictionary(string &input, int beginIndex, int endIndex);
+	void addBlock(int begin, int end);
+	void getResult();
 
 };

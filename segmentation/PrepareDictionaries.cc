@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
+#include <list>
 #include "HashDictionary.h"
 #include "PrepareDictionaries.h"
 #include "HashDictionary.h"
@@ -246,7 +247,7 @@ void PrepareDictionaries::searchHash(string input, vector<string> &output)
 				}
 
  				output.push_back(input.substr(begin,result));
-			
+				addBlock(begin, begin + result);
 				begin += result;
 				
 			}
@@ -255,6 +256,7 @@ void PrepareDictionaries::searchHash(string input, vector<string> &output)
 		{
 			hit = true;
 			output.push_back(input.substr(beginIndex, end - beginIndex));
+			addBlock(beginIndex, end);
 			
 		}
 
@@ -262,6 +264,7 @@ void PrepareDictionaries::searchHash(string input, vector<string> &output)
 	}
 
 	freWords->collect();
+	
 }
 
 
@@ -295,12 +298,14 @@ void PrepareDictionaries::collectNames(string &input, int beginIndex, int endInd
 			{
 				hit = true;
 				output.push_back(input.substr(beginIndex, index - beginIndex));
+				addBlock(beginIndex, index);
 				
 			}
 
 			if(result == 6) 
 			{
 				output.push_back(input.substr(index, result));
+				addBlock(index, index + result);
 				
 			}
 
@@ -308,7 +313,8 @@ void PrepareDictionaries::collectNames(string &input, int beginIndex, int endInd
 			int titleResult = titleDic->search(input, index + result, 1, 0);
 			if(titleResult > 0) //if a family name followed by a title , it can be recognized be a name
 			{
-				output.push_back(input.substr(index, result + titleResult));				
+				output.push_back(input.substr(index, result + titleResult));
+				addBlock(index, index + result + titleResult);
 				index += result + titleResult;
 			}
 			else
@@ -318,7 +324,9 @@ void PrepareDictionaries::collectNames(string &input, int beginIndex, int endInd
 				if(titleResult > 0)
 				{
 					output.push_back(input.substr(index, result + 3 ));
+					addBlock(index, index + result + 3);
 					output.push_back(input.substr(index, result + 3 + titleResult));
+					addBlock(index, index + result + 3 + titleResult);
 					index += result + 3 + titleResult;
 				}else
 				{
@@ -327,7 +335,7 @@ void PrepareDictionaries::collectNames(string &input, int beginIndex, int endInd
 					if(titleResult > 0)
 					{
 						output.push_back(input.substr(index,  result + 6 + titleResult));
-						
+						addBlock(index, index + result + 6 + titleResult);
 						index +=  result + 6 + titleResult;
 					}
 					else
@@ -337,24 +345,33 @@ void PrepareDictionaries::collectNames(string &input, int beginIndex, int endInd
 						if(left > 6)
 						{
 							output.push_back(input.substr(index, result + 3));
+							addBlock(index, index + result + 3);
 							output.push_back(input.substr(index, result + 6));
+							addBlock(index, index + result + 6);
 						}
 						if(left ==  0)
 						{
 							int totalLeft = end - index - result;
 							if(totalLeft >= 6)
+							{
 								output.push_back(input.substr(index, result + 6));
+								addBlock(index, index + result + 6);
+							}
 							return;
 						}else if(left == 3)
 						{
 							output.push_back(input.substr(index, result + 3));
+							addBlock(index, index + result + 3);
 							return;
 						}
 						else if(left == 6)
 						{
 							output.push_back(input.substr(index, result + 3));
+							addBlock(index, index + result + 3);
 							output.push_back(input.substr(index, result + 6));
+							addBlock(index, index + result + 6);
 							output.push_back(input.substr(index + result, 6));
+							addBlock(index + result, index + result + 6);
 							return;
 						}else{
 							index += result;
@@ -370,6 +387,7 @@ void PrepareDictionaries::collectNames(string &input, int beginIndex, int endInd
 	if(hit == false)
 	{
 		output.push_back(input.substr(beginIndex, index - beginIndex));
+		addBlock(beginIndex, index);
 	}
 	
 }
@@ -397,6 +415,7 @@ void PrepareDictionaries::collectChineseNumbers(string &input, int beginIndex, i
 				if(begin > falseBegin)
 				{
 					output.push_back(input.substr(falseBegin, begin - falseBegin));
+					addBlock(falseBegin, begin);
 					falseBegin= index;
 				}
 			}
@@ -445,6 +464,7 @@ void PrepareDictionaries::collectChineseNumbers(string &input, int beginIndex, i
 							}
 						
 						output.push_back(input.substr(begin, index - begin));
+						addBlock(begin, index);
 						hit = false;
 						falseBegin = index;
 						index += 6;
@@ -453,6 +473,7 @@ void PrepareDictionaries::collectChineseNumbers(string &input, int beginIndex, i
 				else
 				{
 					output.push_back(input.substr(begin, index - begin));
+					addBlock(begin, index);
 					hit = false;
 					falseBegin = index;
 					index += 3;
@@ -523,10 +544,12 @@ void PrepareDictionaries::collectChineseNumbers(string &input, int beginIndex, i
 
 
 		output.push_back(input.substr(begin, index - begin));
+		addBlock(begin, index);
 	}
 	else
 	{
 		output.push_back(input.substr(falseBegin, endIndex - falseBegin));
+		addBlock(falseBegin, endIndex);
 	}
 
 }
@@ -557,7 +580,10 @@ void PrepareDictionaries::collectLatinWords(string &input, int beginIndex, int e
 		{
 			begin = index;
 			if(!hit)
+			{
 				output.push_back(input.substr(falseBegin,index  - falseBegin));
+				addBlock(falseBegin, index);
+			}			
 			hit = true;
 			while(hit)
 			{
@@ -567,13 +593,17 @@ void PrepareDictionaries::collectLatinWords(string &input, int beginIndex, int e
 					hit = false;
 			}
 			output.push_back(input.substr(begin, index  - begin));
+			addBlock(begin, index);
 			hit = true;
 		}
 		else if(isNumber(temp))
 		{
 			begin = index;
 			if(!hit)
+			{
 				output.push_back(input.substr(falseBegin,index - falseBegin));
+				addBlock(falseBegin, index);
+			}
 			hit = true;
 			index++;
 			while(hit)
@@ -605,6 +635,7 @@ void PrepareDictionaries::collectLatinWords(string &input, int beginIndex, int e
 				index -= 3;
 			
 			output.push_back(input.substr(begin, index - begin));
+			addBlock(begin, index);
 			hit = true;
 		}else
 		{
@@ -647,7 +678,67 @@ bool PrepareDictionaries::isLatinCharacter(char in)
 
 
 
+void PrepareDictionaries::addBlock(int begin, int end)
+{
+	Block block(begin, end);
+	outputList.push_back(block);
+	
+}
 
+void PrepareDictionaries::getResult()
+{
+	
+	Block block1, block2;
+	std::list<Block>::iterator iter1 = freWords->results.begin();
+	std::list<Block>::iterator iter2 = outputList.begin();
+	while((iter1 != freWords->results.end()) && (iter2 != outputList.end()))
+	{
+		block1 = *iter1;
+		block2 = *iter2;
+		if(block1.begin > block2.begin)
+		{
+			results.push_back(block2);
+			iter2++;
+		}
+		else if(block1.begin < block2.begin)
+		{
+			results.push_back(block1);
+			iter1++;
+
+		}else
+		{
+			if(block1.end == block2.end)
+			{
+				results.push_back(block1);
+				iter1++;
+				iter2++;
+			}
+			else if(block1.end < block2.end)
+			{
+				results.push_back(block1);
+				iter1++;
+			}else
+			{
+				results.push_back(block2);
+				iter2++;
+			}
+		}
+
+	}
+	
+	while(iter1 != freWords->results.end())
+	{
+		block1 = *iter1;
+		results.push_back(block1);
+		*iter1++;
+	}
+	while(iter2 !=outputList.end())
+	{
+		block2 = *iter2;
+		results.push_back(block2);
+		*iter2++;
+	}
+}
 
 
 void PrepareDictionaries::splitString(string input, vector<string> &list_string)

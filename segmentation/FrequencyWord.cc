@@ -6,7 +6,6 @@
 #include <algorithm>
 #include "FrequencyWord.h"
 #include "unicode.h"
-#include "BinaryDictionary.h"
 
 
 using namespace std;
@@ -24,10 +23,12 @@ FrequencyWord::~FrequencyWord(void)
 
 }
 
+
+
 void FrequencyWord::addBlock(int begin, int end)
 {
 	Block block(begin, end);
-	blocks.push_back(block);
+	originalBlocks.push_back(block);
 	
 	string temp = input.substr(begin, end-begin);
 	Utf8Iterator it(temp);
@@ -44,6 +45,13 @@ void FrequencyWord::addBlock(int begin, int end)
 	}
 }
 
+void FrequencyWord::collect()
+{
+	 collectFrequencyCharacters();
+	 collectPotentialWords();	
+	 collectFrequencyWords();
+	 segment();
+}
 
 bool comp(const string& str1, const string& str2)
 {
@@ -51,23 +59,24 @@ bool comp(const string& str1, const string& str2)
 }
 
 
-
-void FrequencyWord::collect()
-{
-	map<int, int> frequencyCharacters;
-
+void FrequencyWord::collectFrequencyCharacters()
+{	
 	for(int i = 0; i < 22000; i++)
 	{
 		if(frequency[i] > 2)
 			frequencyCharacters.insert(pair<int,int>(i + 19968,frequency[i]));
 	}
+}
 
+
+void FrequencyWord::collectPotentialWords()
+{
 	list<Block>::iterator it;
 	
 	Block tempBlock;
 	string output;
 
-	for (it=blocks.begin();   it!=blocks.end();   ++it) 
+	for (it=originalBlocks.begin();   it!=originalBlocks.end();   ++it) 
 	{ 
 		tempBlock = *it;
 		string strTemp = input.substr(tempBlock.begin, tempBlock.end - tempBlock.begin);
@@ -120,19 +129,29 @@ void FrequencyWord::collect()
 		}
 	}
 
+	
+}
+
+
+void FrequencyWord::collectFrequencyWords()
+{
+	
 	collectedWords.sort(comp);
 	vector<string> tempWords;
 	string temp, potentialWord;
 	int count = 0;
-	for(list<string>::const_iterator citer = collectedWords.begin(); citer != collectedWords.end(); ++citer)//looking for potential words;
+	list<string>::const_iterator citer = collectedWords.begin(); 
+	while(citer != collectedWords.end())//looking for potential words;
 	{
-		count = 0;
+		count = 1;
 		potentialWord = temp = *citer;
+		++citer;
 		while(temp.compare(potentialWord) == 0 &&citer != collectedWords.end())
 		{
-			count++;
-			++citer;
+			count++;		
 			temp = *citer;
+
+			++citer;
 		}
 		if(count>2)
 			tempWords.push_back(potentialWord);
@@ -144,12 +163,15 @@ void FrequencyWord::collect()
 	copy(tempWords.begin(), tempWords.end(), tempDictionary);
 
 	//make binaryDictionary
-	BinaryDictionary *binaryDictionary = new BinaryDictionary(tempDictionary, size);
+	binaryDictionary = new BinaryDictionary(tempDictionary, size);
 
-	
+}
 
+void FrequencyWord::segment()
+{
 	//segment the string using word not in dictionary
 	Block block;
+	list<Block>::iterator it;
 	for(it=potentialBlocks.begin();   it!=potentialBlocks.end();   ++it) 
 	{
 		block = *it;
@@ -171,32 +193,6 @@ void FrequencyWord::collect()
 		}
 		
 	}
-	
 
-
-
-/*
-	for(list<string>::const_iterator citer = collectedWords.begin(); citer != collectedWords.end(); ++citer)
-	{
-		output += *citer;
-		output+="....";
-	
-	}		
-
-*/			
-   
-
-	  ofstream fout("5.txt");
-    if(!fout)
-    {
-        fout << "Cannot open output file\n";
-        return ;
-    } 
-
-	fout<<output;
-	fout.close();
-
-	 size = potentialWords.size();
-	cout<<"size"<<size<<endl;
 
 }

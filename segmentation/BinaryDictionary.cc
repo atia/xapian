@@ -60,7 +60,7 @@ int BinaryDictionary::search(string input,int offset,int count, unsigned mapChar
 	
 	for(;index<endIndex;index++)
 	{
-		size_t length = ascWords[index].size() - 1;//because word in ascWords all contains '\n' in the end
+		size_t length = ascWords[index].size();//because word in ascWords all contains '\n' in the end
 		if( length < maxLength)
 			break;
 		if((input.size() - offset) < length)
@@ -84,7 +84,7 @@ int BinaryDictionary::search(string input,int offset,int count, unsigned mapChar
 int BinaryDictionary::search(string str) //check whether str in the array,using binary search
 {
 	int begin = beginIndex;
-	int end = endIndex;
+	int end = endIndex - 1;
 	int result;
 	int middle;
 	while(begin <= end)
