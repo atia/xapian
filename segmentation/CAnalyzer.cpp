@@ -59,32 +59,7 @@ void test1()
 	pre->createHashDictionaries();
 	vector<string> output;
 	pre->searchHash(input, output);
-	pre->getResult();
-	list<Block> blocks = pre->results; 
-
-	vector<string>::iterator iter;
-	std::list<Block>::iterator iter1;
-	string strOutput;
-	Block block;
-	string temp;
-	
-	int begin = 0;
-	int end = 0;
-
-	for(iter1 = blocks.begin(); iter1 != blocks.end(); iter1++)
-	{
-		block = *iter1;
-		if(block.begin > end)
-		{			
-			temp = original.substr(end, block.begin - end);
-			strOutput += temp;
-			strOutput += "//";
-		}
-		temp = original.substr(block.begin, block.end - block.begin);
-		strOutput += temp;
-		strOutput += "//";
-		end = block.end;
-	}
+	string strOutput = pre->getResult();
 
 	ofstream fout("4.txt");
     if(!fout)

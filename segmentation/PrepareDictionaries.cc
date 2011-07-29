@@ -164,8 +164,9 @@ void PrepareDictionaries:: searchDoubleHash(string input, vector<string> &output
 	dic->search(input, output);
 }
 
-void PrepareDictionaries::searchHash(string input, vector<string> &output)
+void PrepareDictionaries::searchHash(string &input, vector<string> &output)
 {
+	this->input = input;
 	freWords = new FrequencyWord(input);
 
 	int offset = 0, index = 0;
@@ -200,7 +201,7 @@ void PrepareDictionaries::searchHash(string input, vector<string> &output)
 		
 		//output.push_back(input.substr(offset, begin - offset));
 		//deal with none Chinese characters
-		collectLatinWords(input, offset, begin, output);
+		collectLatinWords(offset, begin, output);
 	
 	
 
@@ -242,8 +243,8 @@ void PrepareDictionaries::searchHash(string input, vector<string> &output)
 				{
 					hit = true;				
 					//collectNames(input, beginIndex, begin, output,end);	
-					collectChineseNumbers(input, beginIndex, begin, output, end);
-					collectNoFoundDictionary(input, beginIndex, begin);
+					collectChineseNumbers(beginIndex, begin, output, end);
+					collectNoFoundDictionary(beginIndex, begin);
 				}
 
  				output.push_back(input.substr(begin,result));
@@ -268,7 +269,7 @@ void PrepareDictionaries::searchHash(string input, vector<string> &output)
 }
 
 
-void PrepareDictionaries::collectNoFoundDictionary(string &input, int beginIndex, int endIndex)
+void PrepareDictionaries::collectNoFoundDictionary(int beginIndex, int endIndex)
 {
 	if(endIndex - beginIndex >= 6)
 		freWords->addBlock(beginIndex,endIndex);
@@ -276,7 +277,7 @@ void PrepareDictionaries::collectNoFoundDictionary(string &input, int beginIndex
 }
 
 
-void PrepareDictionaries::collectNames(string &input, int beginIndex, int endIndex, vector<string> &output, int end)
+void PrepareDictionaries::collectNames(int beginIndex, int endIndex, vector<string> &output, int end)
 {
 	bool hit = false;
 	int index = beginIndex;
@@ -392,7 +393,7 @@ void PrepareDictionaries::collectNames(string &input, int beginIndex, int endInd
 	
 }
 
-void PrepareDictionaries::collectChineseNumbers(string &input, int beginIndex, int endIndex, vector<string> &output, int end)
+void PrepareDictionaries::collectChineseNumbers(int beginIndex, int endIndex, vector<string> &output, int end)
 {
 	bool hit = false;
 	
@@ -430,7 +431,7 @@ void PrepareDictionaries::collectChineseNumbers(string &input, int beginIndex, i
 
 			if(hit)
 			{
-				dot = isChineseDot(input, index);
+				dot = isChineseDot(index);
 				if (dot) 
 				{
 					result = numberDic->search(input, index + 3);
@@ -453,7 +454,7 @@ void PrepareDictionaries::collectChineseNumbers(string &input, int beginIndex, i
 										}
 										else
 										{
-											dot = isChineseDot(input, begin);
+											dot = isChineseDot(begin);
 											if(!dot)
 												hit = false;
 
@@ -498,7 +499,7 @@ void PrepareDictionaries::collectChineseNumbers(string &input, int beginIndex, i
 				if(dot)
 					hit = false;
 				else{
-					dot = isChineseDot(input, index);
+					dot = isChineseDot(index);
 					if(!dot)
 						hit = false;
 
@@ -532,7 +533,7 @@ void PrepareDictionaries::collectChineseNumbers(string &input, int beginIndex, i
 					}
 					else
 					{
-						dot = isChineseDot(input, begin);
+						dot = isChineseDot(begin);
 						if(!dot)
 							hit = false;
 					}
@@ -554,7 +555,7 @@ void PrepareDictionaries::collectChineseNumbers(string &input, int beginIndex, i
 
 }
 
-bool PrepareDictionaries::isChineseDot(string &input, int offset)
+bool PrepareDictionaries::isChineseDot(int offset)
 {
 	string str = input.substr(offset, 3);
 	Utf8Iterator it(str);
@@ -565,7 +566,7 @@ bool PrepareDictionaries::isChineseDot(string &input, int offset)
 		return false;
 }
 
-void PrepareDictionaries::collectLatinWords(string &input, int beginIndex, int endIndex, vector<string> &output)
+void PrepareDictionaries::collectLatinWords(int beginIndex, int endIndex, vector<string> &output)
 {
 	char temp;
 	int index = beginIndex;
@@ -613,7 +614,7 @@ void PrepareDictionaries::collectLatinWords(string &input, int beginIndex, int e
 				if(numberDic->search(input, index))
 				{
 					index += 3;
-				}else if(isChineseDot(input, index) && (dot < begin))
+				}else if(isChineseDot(index) && (dot < begin))
 				{
 					dot = index;
 					index += 3;
@@ -685,9 +686,8 @@ void PrepareDictionaries::addBlock(int begin, int end)
 	
 }
 
-void PrepareDictionaries::getResult()
+void PrepareDictionaries::getResult( vector<string> &output)
 {
-	
 	Block block1, block2;
 	std::list<Block>::iterator iter1 = freWords->results.begin();
 	std::list<Block>::iterator iter2 = outputList.begin();
@@ -738,6 +738,28 @@ void PrepareDictionaries::getResult()
 		results.push_back(block2);
 		*iter2++;
 	}
+
+	std::list<Block>::iterator iter;
+	Block block;
+	string temp;
+	
+	int begin = 0;
+	int end = 0;
+
+	for(iter = results.begin(); iter != results.end(); iter++)
+	{
+		block = *iter;
+		if(block.begin > end)
+		{			
+			temp = input.substr(end, block.begin - end);
+			output.push_back(temp);
+		}
+		temp = input.substr(block.begin, block.end - block.begin);
+		output.push_back(temp);
+		end = block.end;
+	}
+
+	
 }
 
 
