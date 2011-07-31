@@ -7,10 +7,28 @@
 #include <list>
 #include "PrepareDictionaries.h"
 
-
-int invalid = 0;
-int invalidNumber = 0;
 using namespace std;
+
+#define TESTCASE(S) {#S, test_##S}
+#define END_OF_TESTCASES {0, 0}
+
+//#include "../xapian-core/tests/harness/testsuite.h"
+//#include "../xapian-core/tests/harness/testutils.h"
+
+struct test {
+    const char *query;
+    const char *expect;
+};
+
+/*
+static const test test_or_queries[] = 
+{
+	{"中华人民共和国是一个不好的国家","中华人民共和国|是|一个|不好的|国家"},
+	{"好漂亮的姑娘啊","好|漂亮|的|姑娘|啊"}
+
+};
+
+*/
 
 void test1();
 void testDoubleDictionary();
@@ -33,8 +51,20 @@ int _tmain(int argc, _TCHAR* argv[])
 	 clock_t finish = clock();
 	int time = finish - start;
 	cout<<time<<endl;
-
+	
+/*
+	try {
+		test_driver::parse_command_line(argc, argv);
+	 return test_driver::run(tests);
+	} catch (const char * e) {
+		cout << e << endl;
+		return 1;
+	}
+	*/
 }
+
+
+
 
 
 void test1()
@@ -52,14 +82,25 @@ void test1()
 		input += str;
 	}
 
+
+
+//	string original = "中华人民共和国";
 	string original = input;
 
 	PrepareDictionaries * pre = new PrepareDictionaries(); 
 	pre->loadHashDictionares();
 	pre->createHashDictionaries();
 	vector<string> output;
-	pre->searchHash(input, output);
-	string strOutput = pre->getResult();
+	pre->searchHash(original, output);
+	 pre->getResult(output);
+
+	 vector<string>::iterator iter;
+	string strOutput;
+	for(iter = output.begin(); iter != output.end(); iter++)
+	{
+		strOutput += *iter;
+		strOutput += "//";
+	}
 
 	ofstream fout("4.txt");
     if(!fout)

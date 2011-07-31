@@ -13,9 +13,12 @@ using namespace Xapian;
 
 int frequency[22000];
 
-FrequencyWord::FrequencyWord(string &input)
+FrequencyWord::FrequencyWord(string &input, list<Block> &orginalBlocks)
 {
 	this->input = input;
+	this->originalBlocks = orginalBlocks;
+	analyzeBlocks();
+	
 }
 
 FrequencyWord::~FrequencyWord(void)
@@ -25,24 +28,30 @@ FrequencyWord::~FrequencyWord(void)
 
 
 
-void FrequencyWord::addBlock(int begin, int end)
+void FrequencyWord::analyzeBlocks()
 {
-	Block block(begin, end);
-	originalBlocks.push_back(block);
-	
-	string temp = input.substr(begin, end-begin);
-	Utf8Iterator it(temp);
-	int character;
-	while(it !=Utf8Iterator())
+	std::list<Block>::iterator iter;
+	string temp;
+	Block block;
+	for (iter=originalBlocks.begin();   iter!=originalBlocks.end();   ++iter) 
 	{
-
-		character = *it;
-		if(character <= 40895 && character >= 19968)
+		block = *iter;
+		temp = input.substr(block.begin, block.end - block.begin);
+		Utf8Iterator it(temp);
+		int character;
+		while(it !=Utf8Iterator())
 		{
-			frequency[character - 19968]++;
+
+			character = *it;
+			if(character <= 40895 && character >= 19968)
+			{
+				frequency[character - 19968]++;
+			}
+			++it;
 		}
-		++it;
 	}
+
+	collect();
 }
 
 void FrequencyWord::collect()

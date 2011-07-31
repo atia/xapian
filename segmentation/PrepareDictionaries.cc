@@ -17,8 +17,7 @@
 #include "BinaryDictionary.h"
 #include "unicode.h"
 
-extern int invalid ;
-extern int invalidNumber;
+
 using namespace std;
 using namespace Xapian;
 
@@ -35,10 +34,7 @@ PrepareDictionaries::~PrepareDictionaries()
 void PrepareDictionaries::loadDictionares()
 {
 	
-	
-	string str;
-
-		
+	string str;		
 	ascWords = new string[230000];
 	FILE *fp;
 	if((fp=fopen("compiled-base.dic","r"))==NULL)
@@ -87,77 +83,9 @@ void PrepareDictionaries::loadHashDictionares()
 
 	dict = new HashDictionary(ascWords, totalNumber);	
 	
-	getFamilyNameDictionary();
-	getTitleDictionary();
-	getNumberDictionary();
-		
 }
 
-void PrepareDictionaries::getFamilyNameDictionary()
-{
-	string str;
 
-		
-	string *familyNames = new string[500];
-	FILE *fp;
-	if((fp=fopen("x-confucian-family-name.dic","r"))==NULL)
-	{
-		cout<<"file not open"<<endl;
-		exit(1);
-	}
-	int iFamily = 0;
-	char aa[100];
-	
-	while(fgets(aa, 100, fp) != NULL)
-	{
-		familyNames[iFamily++] = string(aa, strlen(aa) - 1);
-	}	
-
-	familyNameDic = new HashDictionary(familyNames, iFamily);
-
-}
-
-void PrepareDictionaries::getTitleDictionary()
-{
-	string str;		
-	string *titleWords = new string[500];
-	FILE *fp;
-	if((fp=fopen("title.dic","r"))==NULL)
-	{
-		cout<<"file not open"<<endl;
-		exit(1);
-	}
-	int index = 0;
-	char aa[100];
-	
-	while(fgets(aa, 100, fp) != NULL)
-	{
-		titleWords[index++] = string(aa, strlen(aa) - 1);
-	}	
-
-	titleDic = new HashDictionary(titleWords, index);
-
-}
-void PrepareDictionaries::getNumberDictionary()
-{
-	string str;		
-	string *numbers = new string[30];
-	FILE *fp;
-	if((fp=fopen("number.dic","r"))==NULL)
-	{
-		cout<<"file not open"<<endl;
-		exit(1);
-	}
-	int index = 0;
-	char aa[10];
-	
-	while(fgets(aa, 10, fp) != NULL)
-	{
-		numbers[index++] = string(aa, strlen(aa) - 1);
-	}	
-
-	numberDic = new BinaryDictionary(numbers, index);
-}
 
 void PrepareDictionaries:: searchDoubleHash(string input, vector<string> &output)
 {
@@ -167,7 +95,7 @@ void PrepareDictionaries:: searchDoubleHash(string input, vector<string> &output
 void PrepareDictionaries::searchHash(string &input, vector<string> &output)
 {
 	this->input = input;
-	freWords = new FrequencyWord(input);
+	notFoundWords = new NotFoundWords(input);
 
 	int offset = 0, index = 0;
 	size_t inputLength = input.size();
@@ -199,7 +127,7 @@ void PrepareDictionaries::searchHash(string &input, vector<string> &output)
 			++it;
 		}	
 		
-		//output.push_back(input.substr(offset, begin - offset));
+		
 		//deal with none Chinese characters
 		collectLatinWords(offset, begin, output);
 	
@@ -241,13 +169,11 @@ void PrepareDictionaries::searchHash(string &input, vector<string> &output)
 				
 				if(hit == false)
 				{
-					hit = true;				
-					//collectNames(input, beginIndex, begin, output,end);	
-					collectChineseNumbers(beginIndex, begin, output, end);
+					hit = true;						
 					collectNoFoundDictionary(beginIndex, begin);
 				}
 
- 				output.push_back(input.substr(begin,result));
+ 				
 				addBlock(begin, begin + result);
 				begin += result;
 				
@@ -256,7 +182,7 @@ void PrepareDictionaries::searchHash(string &input, vector<string> &output)
 		if(hit == false)
 		{
 			hit = true;
-			output.push_back(input.substr(beginIndex, end - beginIndex));
+		
 			addBlock(beginIndex, end);
 			
 		}
@@ -264,7 +190,7 @@ void PrepareDictionaries::searchHash(string &input, vector<string> &output)
 		offset = end;
 	}
 
-	freWords->collect();
+	notFoundWords->collect();
 	
 }
 
@@ -272,298 +198,8 @@ void PrepareDictionaries::searchHash(string &input, vector<string> &output)
 void PrepareDictionaries::collectNoFoundDictionary(int beginIndex, int endIndex)
 {
 	if(endIndex - beginIndex >= 6)
-		freWords->addBlock(beginIndex,endIndex);
+		notFoundWords->addBlock(beginIndex,endIndex);
 
-}
-
-
-void PrepareDictionaries::collectNames(int beginIndex, int endIndex, vector<string> &output, int end)
-{
-	bool hit = false;
-	int index = beginIndex;
-	while(index < endIndex)
-	{
-		int result = familyNameDic->search(input, index, 1, 0);
-		if(result == -1)
-		{
-			if(hit == true)
-			{
-				hit = false;
-				beginIndex = index;
-			}
-			index += 3;
-		}
-		else 
-		{
-			if(hit == false)
-			{
-				hit = true;
-				output.push_back(input.substr(beginIndex, index - beginIndex));
-				addBlock(beginIndex, index);
-				
-			}
-
-			if(result == 6) 
-			{
-				output.push_back(input.substr(index, result));
-				addBlock(index, index + result);
-				
-			}
-
-			//check whether it followed by a title
-			int titleResult = titleDic->search(input, index + result, 1, 0);
-			if(titleResult > 0) //if a family name followed by a title , it can be recognized be a name
-			{
-				output.push_back(input.substr(index, result + titleResult));
-				addBlock(index, index + result + titleResult);
-				index += result + titleResult;
-			}
-			else
-			{		
-				// if there is a character between a family name and a title, then the character between them might be a first name
-				titleResult = titleDic->search(input, index + result + 3, 1, 0);
-				if(titleResult > 0)
-				{
-					output.push_back(input.substr(index, result + 3 ));
-					addBlock(index, index + result + 3);
-					output.push_back(input.substr(index, result + 3 + titleResult));
-					addBlock(index, index + result + 3 + titleResult);
-					index += result + 3 + titleResult;
-				}else
-				{
-					//check whether there are two characters between a family name and a title.
-					titleResult = titleDic->search(input, index +  result + 6, 1, 0);
-					if(titleResult > 0)
-					{
-						output.push_back(input.substr(index,  result + 6 + titleResult));
-						addBlock(index, index + result + 6 + titleResult);
-						index +=  result + 6 + titleResult;
-					}
-					else
-					{
-						//if there is not a title found			
-						int left = endIndex - index - result; 
-						if(left > 6)
-						{
-							output.push_back(input.substr(index, result + 3));
-							addBlock(index, index + result + 3);
-							output.push_back(input.substr(index, result + 6));
-							addBlock(index, index + result + 6);
-						}
-						if(left ==  0)
-						{
-							int totalLeft = end - index - result;
-							if(totalLeft >= 6)
-							{
-								output.push_back(input.substr(index, result + 6));
-								addBlock(index, index + result + 6);
-							}
-							return;
-						}else if(left == 3)
-						{
-							output.push_back(input.substr(index, result + 3));
-							addBlock(index, index + result + 3);
-							return;
-						}
-						else if(left == 6)
-						{
-							output.push_back(input.substr(index, result + 3));
-							addBlock(index, index + result + 3);
-							output.push_back(input.substr(index, result + 6));
-							addBlock(index, index + result + 6);
-							output.push_back(input.substr(index + result, 6));
-							addBlock(index + result, index + result + 6);
-							return;
-						}else{
-							index += result;
-						}
-					}
-
-				}
-
-			}
-				
-		}
-	}
-	if(hit == false)
-	{
-		output.push_back(input.substr(beginIndex, index - beginIndex));
-		addBlock(beginIndex, index);
-	}
-	
-}
-
-void PrepareDictionaries::collectChineseNumbers(int beginIndex, int endIndex, vector<string> &output, int end)
-{
-	bool hit = false;
-	
-	int index = beginIndex;
-	bool result;
-	int begin = beginIndex;
-	int falseBegin = beginIndex;
-	unsigned temp;
-	bool dot = false; //one Chinese number should only contain only one dot
-	string str;
-	while(index < endIndex)
-	{
-		result = numberDic->search(input, index); //check whether the next character is a Chinese-number character
-		if(result) // if it is a Chinese character
-		{
-			if(hit == false)
-			{
-				hit = true;
-				begin = index;
-				if(begin > falseBegin)
-				{
-					output.push_back(input.substr(falseBegin, begin - falseBegin));
-					addBlock(falseBegin, begin);
-					falseBegin= index;
-				}
-			}
-			index += 3;
-		}else
-		{
-			if(dot)
-			{
-				hit = false;
-				index += 3;
-			}
-
-			if(hit)
-			{
-				dot = isChineseDot(index);
-				if (dot) 
-				{
-					result = numberDic->search(input, index + 3);
-					if(result == true)
-						index += 6;
-					else
-					{
-						
-							if(begin == beginIndex) // if the numbers are in first location, then check the characters before it
-							{
-								while(hit)
-								{
-									begin -= 3;
-									result = numberDic->search(input, begin);
-									if(!result)
-									{
-										if(dot)
-										{
-											hit = false;
-										}
-										else
-										{
-											dot = isChineseDot(begin);
-											if(!dot)
-												hit = false;
-
-										}
-
-									}
-								}
-							}
-						
-						output.push_back(input.substr(begin, index - begin));
-						addBlock(begin, index);
-						hit = false;
-						falseBegin = index;
-						index += 6;
-					}
-				}
-				else
-				{
-					output.push_back(input.substr(begin, index - begin));
-					addBlock(begin, index);
-					hit = false;
-					falseBegin = index;
-					index += 3;
-				}
-			}
-			else
-				index += 3;
-		}
-
-	}
-
-
-	if(hit == true){ // if the string which is not found in dictionary is finished, then search the string followed
-					//because some numbers will be in dictionary as other meaning, and it will be segement before collect numbers
-					// so we have to search the followed characters.
-
-		while(hit)
-		{
-			result = numberDic->search(input, index);
-			if(!result)
-			{
-				if(dot)
-					hit = false;
-				else{
-					dot = isChineseDot(index);
-					if(!dot)
-						hit = false;
-
-				}
-			}
-			index += 3;
-		}
-
-		
-		index -= 6;
-		result = numberDic->search(input, index);
-
-		if(result)
-			index += 3;
-
-
-
-		hit = true;
-		
-		if(begin == beginIndex) // if the numbers are in first location, then check the characters before it
-		{
-			while(hit)
-			{
-				begin -= 3;
-				result = numberDic->search(input, begin);
-				if(!result)
-				{
-					if(dot)
-					{
-						hit = false;
-					}
-					else
-					{
-						dot = isChineseDot(begin);
-						if(!dot)
-							hit = false;
-					}
-				}
-			}
-		}
-		
-		begin += 3;
-
-
-		output.push_back(input.substr(begin, index - begin));
-		addBlock(begin, index);
-	}
-	else
-	{
-		output.push_back(input.substr(falseBegin, endIndex - falseBegin));
-		addBlock(falseBegin, endIndex);
-	}
-
-}
-
-bool PrepareDictionaries::isChineseDot(int offset)
-{
-	string str = input.substr(offset, 3);
-	Utf8Iterator it(str);
-	unsigned temp = *it;
-	if(temp == 28857)
-		return true;
-	else
-		return false;
 }
 
 void PrepareDictionaries::collectLatinWords(int beginIndex, int endIndex, vector<string> &output)
@@ -582,7 +218,7 @@ void PrepareDictionaries::collectLatinWords(int beginIndex, int endIndex, vector
 			begin = index;
 			if(!hit)
 			{
-				output.push_back(input.substr(falseBegin,index  - falseBegin));
+				
 				addBlock(falseBegin, index);
 			}			
 			hit = true;
@@ -593,12 +229,13 @@ void PrepareDictionaries::collectLatinWords(int beginIndex, int endIndex, vector
 				if(!isLatinCharacter(temp))
 					hit = false;
 			}
-			output.push_back(input.substr(begin, index  - begin));
+			
 			addBlock(begin, index);
 			hit = true;
 		}
 		else if(isNumber(temp))
 		{
+			/*
 			begin = index;
 			if(!hit)
 			{
@@ -614,12 +251,13 @@ void PrepareDictionaries::collectLatinWords(int beginIndex, int endIndex, vector
 				if(numberDic->search(input, index))
 				{
 					index += 3;
-				}else if(isChineseDot(index) && (dot < begin))
-				{
-					dot = index;
-					index += 3;
-
 				}
+				//else if(isChineseDot(index) && (dot < begin))
+				//{
+				//	dot = index;
+				//	index += 3;
+
+				//}
 				else if(isNumber(temp)||isPunctuate(temp))
 				{
 					index++;
@@ -638,6 +276,7 @@ void PrepareDictionaries::collectLatinWords(int beginIndex, int endIndex, vector
 			output.push_back(input.substr(begin, index - begin));
 			addBlock(begin, index);
 			hit = true;
+			*/
 		}else
 		{
 			if(hit)
@@ -660,6 +299,7 @@ bool PrepareDictionaries::isPunctuate(char in)
 	else
 		return false;
 }
+
 bool PrepareDictionaries::isNumber(char in)
 {
 	if(in >= '0' && in <= '9')
@@ -689,9 +329,9 @@ void PrepareDictionaries::addBlock(int begin, int end)
 void PrepareDictionaries::getResult( vector<string> &output)
 {
 	Block block1, block2;
-	std::list<Block>::iterator iter1 = freWords->results.begin();
+	std::list<Block>::iterator iter1 = notFoundWords->results.begin();
 	std::list<Block>::iterator iter2 = outputList.begin();
-	while((iter1 != freWords->results.end()) && (iter2 != outputList.end()))
+	while((iter1 != notFoundWords->results.end()) && (iter2 != outputList.end()))
 	{
 		block1 = *iter1;
 		block2 = *iter2;
@@ -726,7 +366,7 @@ void PrepareDictionaries::getResult( vector<string> &output)
 
 	}
 	
-	while(iter1 != freWords->results.end())
+	while(iter1 != notFoundWords->results.end())
 	{
 		block1 = *iter1;
 		results.push_back(block1);

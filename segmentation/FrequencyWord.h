@@ -1,26 +1,21 @@
 #pragma once
 #include <string>
 #include <list>
+#include <map>
 #include "Block.h"
 #include "BinaryDictionary.h"
 
 using namespace std;
 
 
-typedef struct Word{
-	int begin;
-	int end;
-	string value;
-	int frequency;
 
-}Word;
 
 
 
 class FrequencyWord
 {
 public:
-	FrequencyWord(string &input);
+	FrequencyWord(string &input, list<Block> &orginalBlocksS);
 	~FrequencyWord();
 public:
 	//int *frequency;
@@ -34,7 +29,7 @@ public:
 	list<Block> results;
 
 	BinaryDictionary *binaryDictionary;
-	void addBlock(int begin, int end);
+	void analyzeBlocks();
 
 	void collect();
 	void collectPotentialWords();
