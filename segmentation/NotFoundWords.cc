@@ -5,6 +5,11 @@
 NotFoundWords::NotFoundWords(string &input)
 {
 	this->input = input;
+	results.clear();
+	nnResults.clear();
+	frequnceyWords.clear();
+	
+	originalBlocks.clear();
 }
 
 NotFoundWords::~NotFoundWords(void)
@@ -53,23 +58,33 @@ void NotFoundWords::collectOtherWords()
 
 void NotFoundWords::collectWords(int begin, int end)
 {
-	Block block = *iterFrequency;
-	if(block.begin >= begin && block.end <= end)
+	if(iterFrequency == frequnceyWords.end())
 	{
-		collectWords(begin, block.begin);
-		collectWords(block.end, end);
-		iterFrequency++;
-	}else if(block.begin >= begin && block.begin < end && block.end >= end)
-	{
-		collectWords(begin, block.begin);
-	}else if(block.begin < begin && block.end > begin && block.end < end)
-	{
-		collectWords(block.end, end);
-		iterFrequency++;
-	}else
-	{
+	
 		chNumbers->collectChineseNumbers(begin, end);
 		chNames->collectNames(begin, end);		
+	
+	}else
+	{
+
+		Block block = *iterFrequency;
+		if(block.begin >= begin && block.end <= end)
+		{
+			collectWords(begin, block.begin);
+			collectWords(block.end, end);
+			iterFrequency++;
+		}else if(block.begin >= begin && block.begin < end && block.end >= end)
+		{
+			collectWords(begin, block.begin);
+		}else if(block.begin < begin && block.end > begin && block.end < end)
+		{
+			collectWords(block.end, end);
+			iterFrequency++;
+		}else
+		{
+			chNumbers->collectChineseNumbers(begin, end);
+			chNames->collectNames(begin, end);		
+		}
 	}
 
 }

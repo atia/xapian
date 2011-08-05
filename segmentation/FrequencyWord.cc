@@ -18,6 +18,12 @@ FrequencyWord::FrequencyWord(string &input, list<Block> &orginalBlocks)
 	this->input = input;
 	this->originalBlocks = orginalBlocks;
 	analyzeBlocks();
+	originalBlocks.clear();
+	potentialBlocks.clear();
+	collectedWords.clear();
+	potentialWords.clear();
+
+	results.clear();
 	
 }
 

@@ -15,6 +15,7 @@ ChineseNames::ChineseNames(string &input)
 	this->input = input;
 	getFamilyNameDictionary();
 	getTitleDictionary();
+	names.clear();
 }
 
 ChineseNames::~ChineseNames()

@@ -25,7 +25,7 @@ public:
 	void loadDictionares();
 	void loadHashDictionares();
 	void createDoubleHashDictionries();
-	void searchHash(string &input, vector<string> &output);
+	void searchHash(const string &original);
 	void searchDoubleHash(string input, vector<string> &output);
 	string *ascWords;
 	DoubleHashDictionary *dic;
@@ -45,7 +45,7 @@ public:
 	multimap<unsigned, Name> collectorNames;
 
 	
-	void collectLatinWords(int beginIndex, int endIndex, vector<string> &output);
+	void collectLatinWords(int beginIndex, int endIndex);
 	bool isNumber(char in);
 	bool isLatinCharacter(char in);
 	

@@ -92,12 +92,14 @@ void PrepareDictionaries:: searchDoubleHash(string input, vector<string> &output
 	dic->search(input, output);
 }
 
-void PrepareDictionaries::searchHash(string &input, vector<string> &output)
+void PrepareDictionaries::searchHash(const string &original)
 {
-	this->input = input;
+	outputList.clear();
+	results.clear();
+	input = original;
 	notFoundWords = new NotFoundWords(input);
 
-	int offset = 0, index = 0;
+ 	int offset = 0, index = 0;
 	size_t inputLength = input.size();
 
 	bool hit = false;
@@ -129,7 +131,7 @@ void PrepareDictionaries::searchHash(string &input, vector<string> &output)
 		
 		
 		//deal with none Chinese characters
-		collectLatinWords(offset, begin, output);
+		collectLatinWords(offset, begin);
 	
 	
 
@@ -202,7 +204,7 @@ void PrepareDictionaries::collectNoFoundDictionary(int beginIndex, int endIndex)
 
 }
 
-void PrepareDictionaries::collectLatinWords(int beginIndex, int endIndex, vector<string> &output)
+void PrepareDictionaries::collectLatinWords(int beginIndex, int endIndex)
 {
 	char temp;
 	int index = beginIndex;
@@ -235,11 +237,11 @@ void PrepareDictionaries::collectLatinWords(int beginIndex, int endIndex, vector
 		}
 		else if(isNumber(temp))
 		{
-			/*
+			
 			begin = index;
 			if(!hit)
 			{
-				output.push_back(input.substr(falseBegin,index - falseBegin));
+			
 				addBlock(falseBegin, index);
 			}
 			hit = true;
@@ -248,17 +250,7 @@ void PrepareDictionaries::collectLatinWords(int beginIndex, int endIndex, vector
 			{
 				temp = input[index];
 				
-				if(numberDic->search(input, index))
-				{
-					index += 3;
-				}
-				//else if(isChineseDot(index) && (dot < begin))
-				//{
-				//	dot = index;
-				//	index += 3;
-
-				//}
-				else if(isNumber(temp)||isPunctuate(temp))
+				if(isNumber(temp)||isPunctuate(temp))
 				{
 					index++;
 				}
@@ -268,15 +260,11 @@ void PrepareDictionaries::collectLatinWords(int beginIndex, int endIndex, vector
 				}
 
 					
-			}
-
-			if(dot == (index - 3))// this means the last character is Chinese dot
-				index -= 3;
-			
-			output.push_back(input.substr(begin, index - begin));
+			}		
+		
 			addBlock(begin, index);
 			hit = true;
-			*/
+			
 		}else
 		{
 			if(hit)
@@ -328,6 +316,7 @@ void PrepareDictionaries::addBlock(int begin, int end)
 
 void PrepareDictionaries::getResult( vector<string> &output)
 {
+	
 	Block block1, block2;
 	std::list<Block>::iterator iter1 = notFoundWords->results.begin();
 	std::list<Block>::iterator iter2 = outputList.begin();
@@ -388,7 +377,7 @@ void PrepareDictionaries::getResult( vector<string> &output)
 
 	for(iter = results.begin(); iter != results.end(); iter++)
 	{
-		block = *iter;
+ 		block = *iter;
 		if(block.begin > end)
 		{			
 			temp = input.substr(end, block.begin - end);
