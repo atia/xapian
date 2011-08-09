@@ -27,4 +27,5 @@ public:
 	void collectWords(int begin, int end);
 	void analyzerNamesandNumbersResults();
 	void getFinalResults();
+	
 };

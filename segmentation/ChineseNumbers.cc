@@ -220,6 +220,13 @@ void ChineseNumbers::collectChineseNumbers(int beginIndex, int endIndex)
 void ChineseNumbers::addBlock(int begin, int end)
 {
 	Block block(begin, end);
+	if(!chineseNumbers.empty())
+	{
+		Block laterBlock = chineseNumbers.back();
+		if(block.begin >= laterBlock.begin && block.end <= laterBlock.end)
+			return;
+	}
+	
 	chineseNumbers.push_back(block);
 	
 }

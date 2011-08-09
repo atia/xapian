@@ -53,6 +53,7 @@ public:
 	void collectNoFoundDictionary(int beginIndex, int endIndex);
 	void addBlock(int begin, int end);
 	void getResult( vector<string> &output);
+	void twoSplit(int beginIndex, int endIndex, vector<string> &output);
 
 
 };

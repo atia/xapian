@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <cstring>
 #include <list>
+#include <time.h>
 #include "HashDictionary.h"
 #include "PrepareDictionaries.h"
 #include "HashDictionary.h"
@@ -64,7 +65,6 @@ void PrepareDictionaries::loadHashDictionares()
 {
 	
 	string str;
-
 		
 	ascWords = new string[230000];
 	FILE *fp;
@@ -115,7 +115,6 @@ void PrepareDictionaries::searchHash(const string &original)
 	
 	while(offset < inputLength)  //characters before offset is already segmented
 	{
-
 		//looking for a begin for a Chinese substring
 		while(it != Utf8Iterator()) 
 		{
@@ -316,7 +315,7 @@ void PrepareDictionaries::addBlock(int begin, int end)
 
 void PrepareDictionaries::getResult( vector<string> &output)
 {
-	
+	output.clear();	
 	Block block1, block2;
 	std::list<Block>::iterator iter1 = notFoundWords->results.begin();
 	std::list<Block>::iterator iter2 = outputList.begin();
@@ -382,14 +381,38 @@ void PrepareDictionaries::getResult( vector<string> &output)
 		{			
 			temp = input.substr(end, block.begin - end);
 			output.push_back(temp);
+			twoSplit(end, block.begin, output);
 		}
+		if(block.begin == block.end)
+			continue;
 		temp = input.substr(block.begin, block.end - block.begin);
 		output.push_back(temp);
 		end = block.end;
 	}
-
 	
 }
+
+
+
+void PrepareDictionaries::twoSplit(int beginIndex, int endIndex, vector<string> &output)
+{
+	//twoSplit 
+	//if the string is ABC,then get AB/BC
+	//if the string is ABCD, then get AB/BC/CD,and so on
+	if((endIndex - beginIndex) < 9)
+		return;
+	else
+	{
+		int index = beginIndex;
+		while((endIndex - index) >=6)
+		{
+			output.push_back(input.substr(index, 6));
+			index += 3;
+		}
+	}
+
+}
+
 
 
 void PrepareDictionaries::splitString(string input, vector<string> &list_string)
