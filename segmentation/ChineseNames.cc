@@ -170,6 +170,8 @@ void ChineseNames::collectNames(int beginIndex, int endIndex)
 
 void ChineseNames::addBlock(int begin, int end)
 {
+	if(begin == end)
+		return;
 	Block block(begin, end);
 	names.push_back(block);
 	

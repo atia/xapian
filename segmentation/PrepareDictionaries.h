@@ -4,7 +4,7 @@
 #include <map>
 #include <list>
 #include "Block.h"
-#include "DoubleHashDictionary.h"
+
 #include "dictionary.h"
 #include "HashDictionary.h"
 #include "BinaryDictionary.h"
@@ -26,9 +26,8 @@ public:
 	void loadHashDictionares();
 	void createDoubleHashDictionries();
 	void searchHash(const string &original);
-	void searchDoubleHash(string input, vector<string> &output);
 	string *ascWords;
-	DoubleHashDictionary *dic;
+	
 	HashDictionary *dict;
 	
 	NotFoundWords *notFoundWords;
@@ -36,14 +35,7 @@ public:
 	list<Block> results;
 	string input;
 
-	bool hitFamily;
-	int familyIndex;
 	int totalNumber;
-	void splitString(string input, vector<string> &list_string);
-	void createHashDictionaries();
-
-	multimap<unsigned, Name> collectorNames;
-
 	
 	void collectLatinWords(int beginIndex, int endIndex);
 	bool isNumber(char in);

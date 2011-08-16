@@ -227,6 +227,9 @@ void ChineseNumbers::addBlock(int begin, int end)
 			return;
 	}
 	
+	if((end - begin) == 3) //if the number is just a single number, do not deal it
+		return;
+
 	chineseNumbers.push_back(block);
 	
 }

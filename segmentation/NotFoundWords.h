@@ -4,6 +4,7 @@
 #include "Block.h"
 #include "ChineseNumbers.h"
 #include "ChineseNames.h"
+#include "Location.h"
 using namespace std;
 
 
@@ -15,6 +16,7 @@ public:
 	string input;
 	ChineseNumbers *chNumbers;
 	ChineseNames *chNames;
+	Location *locations;
 	list<Block> results;
 	list<Block> nnResults;
 	list<Block> frequnceyWords;

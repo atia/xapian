@@ -14,7 +14,7 @@
 #include "HashDictionary.h"
 #include "PrepareDictionaries.h"
 #include "HashDictionary.h"
-#include "DoubleHashDictionary.h"
+
 #include "BinaryDictionary.h"
 #include "unicode.h"
 
@@ -32,33 +32,6 @@ PrepareDictionaries::~PrepareDictionaries()
 }
 
 
-void PrepareDictionaries::loadDictionares()
-{
-	
-	string str;		
-	ascWords = new string[230000];
-	FILE *fp;
-	if((fp=fopen("compiled-base.dic","r"))==NULL)
-	{
-		cout<<"file not open"<<endl;
-		exit(1);
-	}
-	totalNumber = 0;
-	char aa[100];
-	fgets(aa, 100, fp);
-	
-	string temp = string(aa, strlen(aa) - 1);
-
-	ascWords[totalNumber++] = temp.substr(3);
-	
-	
-	while(fgets(aa, 100, fp) != NULL)
-	{
-		ascWords[totalNumber++] = string(aa, strlen(aa) - 1);
-	}	
-	dic = new DoubleHashDictionary(ascWords, totalNumber);
-		
-}
 
 
 void PrepareDictionaries::loadHashDictionares()
@@ -68,7 +41,7 @@ void PrepareDictionaries::loadHashDictionares()
 		
 	ascWords = new string[230000];
 	FILE *fp;
-	if((fp=fopen("t-base.dic","r"))==NULL)
+	if((fp=fopen("base.dic","r"))==NULL)
 	{
 		cout<<"file not open"<<endl;
 		exit(1);
@@ -87,13 +60,10 @@ void PrepareDictionaries::loadHashDictionares()
 
 
 
-void PrepareDictionaries:: searchDoubleHash(string input, vector<string> &output)
-{
-	dic->search(input, output);
-}
 
 void PrepareDictionaries::searchHash(const string &original)
 {
+
 	outputList.clear();
 	results.clear();
 	input = original;
@@ -413,22 +383,3 @@ void PrepareDictionaries::twoSplit(int beginIndex, int endIndex, vector<string> 
 
 }
 
-
-
-void PrepareDictionaries::splitString(string input, vector<string> &list_string)
-{
-
-
-}
-
-
-void PrepareDictionaries::createHashDictionaries()
-{
-
-	//dic  = new HashDictionary(ascWords, totalNumber);
-	
-}
-
-void PrepareDictionaries::createDoubleHashDictionries()
-{
-}

@@ -41,6 +41,7 @@ void NotFoundWords::collectOtherWords()
 {
 	chNumbers = new ChineseNumbers(input);
 	chNames = new ChineseNames(input);
+	locations = new Location(input);
 	std::list<Block>::iterator iterOriginal;
 	iterFrequency = frequnceyWords.begin();
 	string temp;
@@ -62,7 +63,8 @@ void NotFoundWords::collectWords(int begin, int end)
 	{
 	
 		chNumbers->collectChineseNumbers(begin, end);
-		chNames->collectNames(begin, end);		
+		chNames->collectNames(begin, end);
+		locations->collectLocations(begin, end);
 	
 	}else
 	{
@@ -83,7 +85,8 @@ void NotFoundWords::collectWords(int begin, int end)
 		}else
 		{
 			chNumbers->collectChineseNumbers(begin, end);
-			chNames->collectNames(begin, end);		
+			chNames->collectNames(begin, end);	
+			locations->collectLocations(begin, end);
 		}
 	}
 
