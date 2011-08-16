@@ -1,4 +1,4 @@
-﻿// testSeg.cpp : 定义控制台应用程序的入口点。
+// testSeg.cpp : 定义控制台应用程序的入口点⾿
 //
 
 #include <vector>
@@ -13,6 +13,9 @@ using namespace std;
 
 #include <config.h>
 #include "testsuite.h"
+
+
+
 
 struct test {
 	const string query;//the query is the string that is be segmented
@@ -100,6 +103,9 @@ static const test test_segmentation_strings[] = {
 	{"话音刚落，这个老爷子的尸体竟然自己躺了下去，而且也闭上了眼睛 ","话音刚落|，|这个|老爷子|的|尸体|竟然|自己|躺了|下去|，|而且|也|闭上|了|眼睛| "},
 	{"因为，公婆给儿子买的房产什么的，离婚后媳妇是无份的 ","因为|，|公婆|给|儿子|买的|房产|什么的|，|离婚|后|媳妇|是无份的| "}
 };
+
+int num = 75;
+
 
 string readfromFile(const char *filename)
 {
