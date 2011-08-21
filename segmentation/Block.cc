@@ -11,6 +11,6 @@ Block::Block(int begin,int end)
 	this->end = end;
 }
 
-Block::~Block(void)
+Block::~Block()
 {
 }

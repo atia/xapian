@@ -27,9 +27,9 @@ FrequencyWord::FrequencyWord(string &input, list<Block> &orginalBlocks)
 	
 }
 
-FrequencyWord::~FrequencyWord(void)
+FrequencyWord::~FrequencyWord()
 {
-
+	
 }
 
 
@@ -42,7 +42,8 @@ void FrequencyWord::analyzeBlocks()
 	for (iter=originalBlocks.begin();   iter!=originalBlocks.end();   ++iter) 
 	{
 		block = *iter;
-		temp = input.substr(block.begin, block.end - block.begin);
+		//temp = input.substr(block.begin, block.end - block.begin);
+		string temp(input, block.begin, block.end - block.begin);
 		Utf8Iterator it(temp);
 		int character;
 		while(it !=Utf8Iterator())

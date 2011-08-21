@@ -17,7 +17,7 @@ ChineseNumbers::ChineseNumbers(string &input)
 	getNumberDictionary();
 }
 
-ChineseNumbers::~ChineseNumbers(void)
+ChineseNumbers::~ChineseNumbers()
 {
 }
 

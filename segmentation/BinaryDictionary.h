@@ -10,7 +10,6 @@ class BinaryDictionary :
 public:
 	BinaryDictionary(string *ascWords, int totalCount);
 	BinaryDictionary(string *ascWords, int beginIndex, int endIndex, int totalCount);
-//private:
 	
 public:
 	virtual ~BinaryDictionary();
@@ -20,7 +19,7 @@ public:
 	int count;
 	bool hit;
 	
-	virtual int size();
+	
 	virtual int search(string input,int offset,int count, unsigned mapChar);
 	
 	virtual string getWord(int index);

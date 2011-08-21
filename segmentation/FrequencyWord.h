@@ -18,7 +18,6 @@ public:
 	FrequencyWord(string &input, list<Block> &orginalBlocksS);
 	~FrequencyWord();
 public:
-	//int *frequency;
 	map<int, int> frequencyCharacters;
 	string input;
 	list<Block> originalBlocks;

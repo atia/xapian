@@ -29,11 +29,12 @@ public:
 	bool hit;
 	string *ascWords;
 	string dictionaryPath;
-	int size();
+
 	string getWord(int index);
 	virtual int search(string input,int offset,int count, unsigned mapChar);
+	bool search(string input, int count);
 	void createSubDictionary();
-	bool isSameIndex(int index, string beginMapChar);
+
 	dictionary *createSubDictionary(string *ascWords, int startIndex, int endIndex);
 	unsigned getIndexChar(string str, int index);
 	unsigned getIndexChar(string str);
