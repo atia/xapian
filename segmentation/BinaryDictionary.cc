@@ -36,11 +36,6 @@ string BinaryDictionary::getWord(int index)
 
 
 
-int BinaryDictionary::size()
-{
-	return count;
-}
-
 
 
 int BinaryDictionary::search(string input,int offset,int count, unsigned mapChar){ 
@@ -67,8 +62,7 @@ int BinaryDictionary::search(string input,int offset,int count, unsigned mapChar
 			break;
 		maxLength = length;
 		string temp = input.substr(offset, length);
-
-		//if(input.compare(offset,length, ascWords[index]) == 0)
+		
 		if(temp.compare(ascWords[index]) == 0)
 		{
 			hit = true;

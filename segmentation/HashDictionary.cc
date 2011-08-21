@@ -46,10 +46,6 @@ HashDictionary::~HashDictionary()
 {
 }
 
-int HashDictionary::size()
-{
-	return 0;
-}
 
 
 void HashDictionary::createSubDictionary()
@@ -66,10 +62,10 @@ void HashDictionary::createSubDictionary()
 	int offset = (mapIndex - 1) * 3;
 	string beginMapChar = ascWords[start].substr(offset, 3);
 	unsigned ubeginMapChar = getIndexChar(beginMapChar);
-	unsigned endMapChar;
+	
 	for(; endIndex < end; endIndex++)
 	{
-		//endMapChar = getIndexChar(ascWords[endIndex],mapIndex);
+	
 		if(ascWords[endIndex].compare(offset,3,beginMapChar) != 0)
 		{
 			
@@ -84,10 +80,6 @@ void HashDictionary::createSubDictionary()
 
 
 
-bool HashDictionary::isSameIndex(int index, string beginMapChar)
-{
-	return true;
-}
 
 
 void HashDictionary::addSubDictionary(unsigned hashChar, int beginIndex, int endIndex)

@@ -69,17 +69,17 @@ void PrepareDictionaries::searchHash(const string &original)
 	input = original;
 	notFoundWords = new NotFoundWords(input);
 
- 	int offset = 0, index = 0;
+ 	size_t offset = 0, index = 0;
 	size_t inputLength = input.size();
 
 	bool hit = false;
 	
 
-	int beginIndex = 0;
-	int end = 0;
-	int begin = 0;
+	size_t beginIndex = 0;
+	size_t end = 0;
+	size_t begin = 0;
 	unsigned temp = 0;
-	size_t leftLength;	
+	
 	Utf8Iterator it(input);
 	
 	
